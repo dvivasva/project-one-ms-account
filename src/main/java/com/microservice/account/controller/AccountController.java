@@ -28,7 +28,7 @@ public class AccountController{
 	
 private final AccountService accountService;
 	
-	@GetMapping(path = "/list")
+	@GetMapping
 	public Mono<ResponseEntity<Flux<Account>>>getAllAccount() {
 		Flux<Account> list=this.accountService.getAllAccount();
 		return  Mono.just(ResponseEntity.ok()
@@ -36,20 +36,20 @@ private final AccountService accountService;
 				.body(list));
 	}
 
-	@GetMapping("/details/{id}")
+	@GetMapping("/{id}")
 	public Mono<ResponseEntity<Account>> getAccountById(@PathVariable String id){
 		var account=this.accountService.getAccountById(id);
 		return account.map(ResponseEntity::ok)
 				.defaultIfEmpty(ResponseEntity.notFound().build());
 	}
 
-	@PostMapping(path = "/create")
+	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public Mono<Account> create(@RequestBody Account account){
 		return this.accountService.createAccount(account);
 	}
 
-	@PutMapping("update/{id}")
+	@PutMapping("/{id}")
 	public Mono<ResponseEntity<Account>> updateAccountById(@PathVariable String id, @RequestBody Account account){
 
 		return this.accountService.updateAccount(id,account)
@@ -57,7 +57,7 @@ private final AccountService accountService;
 				.defaultIfEmpty(ResponseEntity.badRequest().build());
 	}
 
-	@DeleteMapping("delete/{id}")
+	@DeleteMapping("/{id}")
 	public Mono<ResponseEntity<Void>> deleteAccountById(@PathVariable String id){
 		return this.accountService.deleteAccount(id)
 				.map(r -> ResponseEntity.ok().<Void>build())
