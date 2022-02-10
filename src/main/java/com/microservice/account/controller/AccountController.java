@@ -1,6 +1,7 @@
 package com.microservice.account.controller;
 
 
+import com.microservice.account.listenercustomer.dto.Customer;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -42,7 +43,6 @@ private final AccountService accountService;
 		return account.map(ResponseEntity::ok)
 				.defaultIfEmpty(ResponseEntity.notFound().build());
 	}
-
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public Mono<Account> create(@RequestBody Account account){
@@ -63,4 +63,16 @@ private final AccountService accountService;
 				.map(r -> ResponseEntity.ok().<Void>build())
 				.defaultIfEmpty(ResponseEntity.notFound().build());
 	}
+
+	@GetMapping("/listByCustomer/{id}")
+	public Flux<Account> getAccountByCustomerId(@PathVariable("id") String id){
+		return accountService.findAllAccountsByCustomerId(id);
+	}
+
+
+	/* only test
+	@GetMapping("/customer/{id}")
+	public Mono<Customer> getCustomerById(@PathVariable("id") String id) {
+		return accountService.getCustomerById(id);
+	}*/
 }

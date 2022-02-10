@@ -1,35 +1,53 @@
 package com.microservice.account.listenercustomer;
 
 import com.microservice.account.listenercustomer.dto.Customer;
+import com.microservice.account.model.Account;
 import com.microservice.account.utils.UriAccess;
 import com.microservice.account.utils.UriBase;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.util.Collections;
 
+import static org.springframework.data.mongodb.core.query.Criteria.where;
+import static org.springframework.data.mongodb.core.query.Query.query;
 
-@RequiredArgsConstructor
 public class CustomerWebClient {
 
-    private final WebClient webClient;
+    WebClient client = WebClient.builder()
+            .baseUrl(UriBase.baseUrl)
+            .defaultCookie("cookieKey", "cookieValue")
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .defaultUriVariables(Collections.singletonMap("url", UriBase.baseUrl))
+            .build();
 
     public Mono<Customer> getCustomerMono(String id) {
-        return this.webClient.get().uri(UriAccess.GET_CUSTOMER_BY_ID, id)
-                .retrieve().bodyToMono(Customer.class);
+        return client.get()
+                .uri( UriBase.baseUrl+ UriAccess.GET_CUSTOMER_BY_ID+id)
+                .accept(MediaType.APPLICATION_NDJSON)
+                .exchangeToMono(response -> {
+                    if (response.statusCode().equals(HttpStatus.OK)) {
+                        return response.bodyToMono(Customer.class);
+                    }
+                else {
+                    // Turn to error
+                    return response.createException().flatMap(Mono::error);
+                }
+        });
     }
-
     /*
-    public Customer getCustomerById(String id) {
-        return this.webClient.get().uri(UriAccess.GET_CUSTOMER_BY_ID, id)
-                .retrieve()
-                .bodyToMono(Customer.class).block();
+    public Mono<Boolean> isEnterprise(Mono<Customer> customerMono){
+
+        Mono<Boolean> isUserAllowed = Mono.just()
+                .map(UserEntityUtils::convertEntityToModel)
+                .filter(UserModelUtils::isUserAdmin)
+                .switchIfEmpty(Mono.defer(() -> false))
+                .flatmap(userModel -> true);
+
+        return isUserAllowed;
     }*/
-
-
-
-
 
 }
