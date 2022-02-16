@@ -1,24 +1,11 @@
 package com.microservice.account.controller;
 
 
-import com.microservice.account.listenercustomer.dto.Customer;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.microservice.account.model.Account;
+import com.microservice.account.dto.AccountDto;
 import com.microservice.account.service.AccountService;
-
+import com.microservice.account.webclient.dto.Customer;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -30,49 +17,39 @@ public class AccountController{
 private final AccountService accountService;
 	
 	@GetMapping
-	public Mono<ResponseEntity<Flux<Account>>>getAllAccount() {
-		Flux<Account> list=this.accountService.getAllAccount();
-		return  Mono.just(ResponseEntity.ok()
-				.contentType(MediaType.APPLICATION_JSON)
-				.body(list));
+	public Flux<AccountDto>getAllAccount() {
+		return accountService.getAllAccount();
 	}
 
 	@GetMapping("/{id}")
-	public Mono<ResponseEntity<Account>> getAccountById(@PathVariable String id){
-		var account=this.accountService.getAccountById(id);
-		return account.map(ResponseEntity::ok)
-				.defaultIfEmpty(ResponseEntity.notFound().build());
+	public Mono<AccountDto> getAccountById(@PathVariable String id){
+		return accountService.getAccountById(id);
 	}
+
 	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED)
-	public Mono<Account> create(@RequestBody Account account){
-		return this.accountService.createAccount(account);
+	public Mono<AccountDto> createAccount(@RequestBody Mono<AccountDto> accountDtoMono) {
+		return accountService.createAccount(accountDtoMono);
 	}
 
 	@PutMapping("/{id}")
-	public Mono<ResponseEntity<Account>> updateAccountById(@PathVariable String id, @RequestBody Account account){
-
-		return this.accountService.updateAccount(id,account)
-				.map(ResponseEntity::ok)
-				.defaultIfEmpty(ResponseEntity.badRequest().build());
+	public Mono<AccountDto> updateAccount(@RequestBody Mono<AccountDto> accountDtoMono, @PathVariable String id){
+		return accountService.updateAccount(accountDtoMono,id);
 	}
 
 	@DeleteMapping("/{id}")
-	public Mono<ResponseEntity<Void>> deleteAccountById(@PathVariable String id){
-		return this.accountService.deleteAccount(id)
-				.map(r -> ResponseEntity.ok().<Void>build())
-				.defaultIfEmpty(ResponseEntity.notFound().build());
+	public Mono<Void> deleteAccount(@PathVariable String id){
+		return accountService.deleteAccount(id);
 	}
 
 	@GetMapping("/listByCustomer/{id}")
-	public Flux<Account> getAccountByCustomerId(@PathVariable("id") String id){
+	public Flux<AccountDto> getAccountsByCustomerId(@PathVariable("id") String id){
 		return accountService.findAllAccountsByCustomerId(id);
 	}
 
 
-	/* only test
+	//only test
 	@GetMapping("/customer/{id}")
 	public Mono<Customer> getCustomerById(@PathVariable("id") String id) {
 		return accountService.getCustomerById(id);
-	}*/
+	}
 }

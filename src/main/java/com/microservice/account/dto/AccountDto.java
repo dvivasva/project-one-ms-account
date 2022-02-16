@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+
 
 @Data
 @NoArgsConstructor
@@ -13,13 +15,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class AccountDto {
 
 	private String id;
-	private String typeAccount;
-	private String numberAccount;
-	private int keyAccount;
-	private double availableBalanceAccount;
-	private String dateCreationAccount;
-	private String statusAccount;
-	private int idClerkCreation;
+	private String type;
+	private String number;
+	private double availableBalance;
+	private Date dateCreation;
+	private String status;
 	private String customerId;
 
 }
