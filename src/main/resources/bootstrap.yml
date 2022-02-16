@@ -1,0 +1,15 @@
+management:
+    endpoint:
+        exposure:
+            include: '*'
+spring:
+    application:
+        name: project-one-ms-account
+    cloud:
+        config:
+            uri: http://localhost:8888
+    data:
+        mongodb:
+            uri: mongodb+srv://dvivasva:admin23@everis.xiybt.mongodb.net/project-one
+    profiles:
+        active: dev

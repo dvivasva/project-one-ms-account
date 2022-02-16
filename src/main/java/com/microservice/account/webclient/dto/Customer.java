@@ -10,6 +10,7 @@ public class Customer {
 	private String name;
 	private String lastname;
 	private int dni;
-	private String typcustomer;
+	private String typcustomer;  // peronal o empresa
+	private String profile; // vid  pyme
 
 }
